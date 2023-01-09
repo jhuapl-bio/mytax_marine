@@ -846,7 +846,7 @@ function drawPiechart() {
 
 	sliceEnter.append('title')
 		.text(function(d) { 
-			var ret = 'Label: ' + d.data.label + '\nReads: ' + formatNumber(d.value);
+			var ret = 'Label: ' + d.data.label + d.data.common + '\nReads: ' + formatNumber(d.value);
 			if(d.data.segment) {
 				ret += '\nSegment: ' + d.data.segment;
 			}

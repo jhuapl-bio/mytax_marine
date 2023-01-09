@@ -55,35 +55,35 @@ usage() {
 	echo -e ""
 }
 
-gawk_install() {
-	echo -e "" >&2
-	echo -e "       ${RED}Please make sure gawk is installed.${NC}" >&2
-	echo -e "" >&2
-	echo -e "       Check: ${CYAN}https://www.gnu.org/software/gawk/manual/html_node/Installation.html${NC}" >&2
-	echo -e "              for more information" >&2
-	echo -e "" >&2
-}
-jellyfish_install() {
-	echo -e "" >&2
-	echo -e "       ${RED}Please make sure jellyfish version 1 is installed.${NC}" >&2
-	echo -e "" >&2
-	echo -e "       Check: ${CYAN}https://www.cbcb.umd.edu/software/jellyfish/${NC}" >&2
-	echo -e "              for more information" >&2
-	echo -e "" >&2
-	echo -e "       Download: ${CYAN}http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.11.tar.gz${NC}" >&2
-	echo -e "                 MD5: dc994ea8b0896156500ea8c648f24846" >&2
-	echo -e "" >&2
-}
-kraken_install() {
-	echo -e "" >&2
-	echo -e "       ${RED}Please make sure kraken version 1 is installed.${NC}" >&2
-	echo -e "" >&2
-	echo -e "       Check: ${CYAN}https://ccb.jhu.edu/software/kraken/${NC}" >&2
-	echo -e "              for more information" >&2
-	echo -e "" >&2
-	echo -e "       Clone git repository from: ${CYAN}https://github.com/DerrickWood/kraken.git${NC}" >&2
-	echo -e "" >&2
-}
+# gawk_install() {
+# 	echo -e "" >&2
+# 	echo -e "       ${RED}Please make sure gawk is installed.${NC}" >&2
+# 	echo -e "" >&2
+# 	echo -e "       Check: ${CYAN}https://www.gnu.org/software/gawk/manual/html_node/Installation.html${NC}" >&2
+# 	echo -e "              for more information" >&2
+# 	echo -e "" >&2
+# }
+# jellyfish_install() {
+# 	echo -e "" >&2
+# 	echo -e "       ${RED}Please make sure jellyfish version 1 is installed.${NC}" >&2
+# 	echo -e "" >&2
+# 	echo -e "       Check: ${CYAN}https://www.cbcb.umd.edu/software/jellyfish/${NC}" >&2
+# 	echo -e "              for more information" >&2
+# 	echo -e "" >&2
+# 	echo -e "       Download: ${CYAN}http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.11.tar.gz${NC}" >&2
+# 	echo -e "                 MD5: dc994ea8b0896156500ea8c648f24846" >&2
+# 	echo -e "" >&2
+# }
+# kraken_install() {
+# 	echo -e "" >&2
+# 	echo -e "       ${RED}Please make sure kraken version 1 is installed.${NC}" >&2
+# 	echo -e "" >&2
+# 	echo -e "       Check: ${CYAN}https://ccb.jhu.edu/software/kraken/${NC}" >&2
+# 	echo -e "              for more information" >&2
+# 	echo -e "" >&2
+# 	echo -e "       Clone git repository from: ${CYAN}https://github.com/DerrickWood/kraken.git${NC}" >&2
+# 	echo -e "" >&2
+# }
 #---------------------------------------------------------------------------------------------------
 # set default values
 summarize_kmers="false"
@@ -128,34 +128,34 @@ fi
 
 #---------------------------------------------------------------------------------------------------
 # check required software is installed
-gawk_version=$(gawk --version 2> /dev/null | head -n1)
-jellyfish_version=$(jellyfish --version 2> /dev/null | head -n1)
-kraken_version=$(kraken --version 2> /dev/null | head -n1)
+# gawk_version=$(gawk --version 2> /dev/null | head -n1)
+# jellyfish_version=$(jellyfish --version 2> /dev/null | head -n1)
+# kraken_version=$(kraken --version 2> /dev/null | head -n1)
 
-if [[ -z "$gawk_version" ]]; then
-	echo -e "${RED}Error: gawk is not installed${NC}" >&2
-	gawk_install
-	usage
-	exit 2
-fi
-if [[ -z "$jellyfish_version" ]]; then
-	echo -e "${RED}Error: Jellyfish version 1 not installed${NC}" >&2
-	jellyfish_install
-	usage
-	exit 2
-elif [[ -z "$(echo "$jellyfish_version" | grep "jellyfish 1")" ]]; then
-	echo -e "${RED}Error: A version of jellyfish is installed, but not version 1.${NC}" >&2
-	echo -e "       $jellyfish_version" >&2
-	jellyfish_install
-	usage
-	exit 2
-fi
-if [[ -z "$kraken_version" ]]; then
-	echo -e "${RED}Error: Kraken is not installed${NC}" >&2
-	kraken_install
-	usage
-	exit 2
-fi
+# if [[ -z "$gawk_version" ]]; then
+# 	echo -e "${RED}Error: gawk is not installed${NC}" >&2
+# 	gawk_install
+# 	usage
+# 	exit 2
+# fi
+# if [[ -z "$jellyfish_version" ]]; then
+# 	echo -e "${RED}Error: Jellyfish version 1 not installed${NC}" >&2
+# 	jellyfish_install
+# 	usage
+# 	exit 2
+# elif [[ -z "$(echo "$jellyfish_version" | grep "jellyfish 1")" ]]; then
+# 	echo -e "${RED}Error: A version of jellyfish is installed, but not version 1.${NC}" >&2
+# 	echo -e "       $jellyfish_version" >&2
+# 	jellyfish_install
+# 	usage
+# 	exit 2
+# fi
+# if [[ -z "$kraken_version" ]]; then
+# 	echo -e "${RED}Error: Kraken is not installed${NC}" >&2
+# 	kraken_install
+# 	usage
+# 	exit 2
+# fi
 
 #===================================================================================================
 # DEFINE FUNCTIONS
@@ -193,6 +193,16 @@ get_fullstring() {
 			LIST[a[1]];
 			if(a[4] == "scientific name") {
 				name[a[1]] = a[2];
+
+				gsub(/\t\|(\t)?/, "@", $1);
+			}
+		}
+		split($0, a, "@");
+		if(NR == FNR) {
+			LIST[a[1]];
+			if(a[4] == "common name") {
+				common_name[a[1]] = a[2]; 
+				gsub(/\t\|(\t)?/, "@", $1);
 			}
 		} else {
 			parent[a[1]] = a[2];
@@ -209,7 +219,7 @@ get_fullstring() {
 					out = sprintf("%s;%s(%s)|%s", PARENT, name[PARENT], level[PARENT], out);
 				}
 			}
-			printf("%s\t%s\t%s\t%s\t%s\n", TAXID, parent[TAXID], name[TAXID], level[TAXID], out);
+			printf("%s\t%s\t%s\t%s\t%s\t%s\n", TAXID, parent[TAXID], name[TAXID], common_name[TAXID], level[TAXID], out);
 		}
 	}' "$names" "$nodes"
 }

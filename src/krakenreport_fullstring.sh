@@ -69,6 +69,14 @@ from names.dmp and nodes.dmp as follows:
 			LIST[a[1]];
 			if(a[4] == "scientific name") {
 				name[a[1]] = a[2];
+
+				gsub(/\t\|(\t)?/, "@", $1);
+		split($0, a, "@");
+		if(NR == FNR) {
+			LIST[a[1]];
+			if(a[4] == "common name") {
+				common_name[a[1]] = a[2];
+				
 			}
 		} else {
 			parent[a[1]] = a[2];
@@ -85,12 +93,26 @@ from names.dmp and nodes.dmp as follows:
 					out = sprintf("%s;%s(%s)|%s", PARENT, name[PARENT], level[PARENT], out);
 				}
 			}
-			printf("%s\t%s\t%s\t%s\t%s\n", TAXID, parent[TAXID], name[TAXID], level[TAXID], out);
+			printf("%s\t%s\t%s\t%s\t%s\t%s\n", TAXID, parent[TAXID], name[TAXID], level[TAXID], common_name[TAXID], out);
 		}
 	}' names.dmp nodes.dmp | sort -k1,1 > joined.full
 
 EOF
 }
+
+
+   
+                       
+                        
+                  
+        
+                
+                       
+                       
+                                
+
+
+
 
 #-------------------------------------------------
 # set default values
