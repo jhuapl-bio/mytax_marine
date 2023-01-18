@@ -55,6 +55,8 @@ The single script `build_flukraken.sh` functions as an outer wrapper for the inf
 	process_krakendb.sh -> post-processes database for visualization pipeline (not included in this repo yet)
 ```
 
+To Run the UI run `python3 -m http.server 8080` within the sunburst directory
+
 # License and copyright
 
 Copyright (c) 2019 Thomas Mehoke
