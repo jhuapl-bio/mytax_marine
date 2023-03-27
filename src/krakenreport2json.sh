@@ -131,6 +131,7 @@ gawk -F $'\t' \
 	if(0) { "---------------------------------------------------------------"; }
 	if(0 == 1){ print( "For each taxid, print metadata info first" ); }
 	printf("\"name\": \"%s\",\n", label[taxid]);
+	printf("\"extra\": \"%s\",\n", extra[taxid]);
 	printf("\"size\": %s,\n", reads[taxid]);
 	printf("\"rank\": \"%s\",\n", all_ranks[taxid]);
 	for(h in header[taxid]) {
@@ -208,6 +209,7 @@ BEGIN {
 		gsub(/^ */, "", $6);
 		taxid = $5;
 		reads[taxid] = $3;
+		extra[taxid] = $8;
 		label[taxid] = $6;
 		fullstring[taxid] = $7;
 
