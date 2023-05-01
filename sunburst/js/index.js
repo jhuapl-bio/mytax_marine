@@ -840,9 +840,13 @@ function drawPiechart() {
 			return ('slice depth_' + d.depth);
 		})
 		.on('click', function(d) {
-			d3.event.stopPropagation();
-			focusOn(d);
-		});
+            console.log("d", d.data.taxid, "<<<<")
+            $('#image1').attr("src", `img/pictures/${d.data.taxid}.png`)
+
+
+            d3.event.stopPropagation();
+            focusOn(d);
+        });
 
 	sliceEnter.append('title')
 		.text(function(d) { 
@@ -850,6 +854,8 @@ function drawPiechart() {
 			if(d.data.segment) {
 				ret += '\nSegment: ' + d.data.segment;
 			}
+            if(d.data.extra) {
+                ret += '\nName: ' + d.data.extra; }
 			if(d.data.subtype) {
 				ret += '\nSubtype: ' + d.data.subtype;
 			}
@@ -870,18 +876,49 @@ function drawPiechart() {
 		.attr('class', 'hidden-arc')
 		.attr('id', (_, i) => `hiddenArc${i}`)
 		.attr('d', middleArcLine);
+    function checkIfImageExists(url, callback) {
+        const img = new Image();
+        img.src = url;
 
+        if (img.complete) {
+          callback(true);
+        } else {
+          img.onload = () => {
+            callback(true);
+          };
+          
+          img.onerror = () => {
+            callback(false);
+          };
+        }
+      }
 	sliceEnter.append('path')
 		.attr('class', 'main-arc')
 		.style('fill', '#ccc')
 		.on('mouseover', function(d) {
 			var currentEl = d3.select(this);
 			currentEl.style('fill-opacity', 0.5);
+            checkIfImageExists(`img/pictures/${d.data.taxid}.png`, (exists)=>{
+                if(exists){
+                    $('#image1').attr("src", `img/pictures/${d.data.taxid}.png`)
+                    $('#text1').text(d.data.extra)
+                    $('#image1').show()
+                     $('#text1').show()
+                } else {
+                    $('#image1').hide()
+                    $('#text1').hide()
+                }
+            })
 		})
-		.on('mouseout', function(d) {
+		.on('mouseout', async function(d) {  console.log("d", d.data.taxid, "<<<<")
+
 			var currentEl = d3.select(this);
 			currentEl.style('fill-opacity', 1);
+            $('#image1').hide()
+            $('#text1').hide()
+            
 		});
+
 
 	var sliceUpdate = slice.merge(sliceEnter)
 		.transition().call(standardTransition);
