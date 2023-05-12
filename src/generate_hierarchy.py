@@ -49,7 +49,7 @@ parser.add_argument('--report', required = False,  type = str, help = 'Kraken Re
 parser.add_argument('-d', required = False,  type = str, default="\t", help = 'Delimiter for file')
 parser.add_argument('-taxdump', required = False,  type = str, default=None, help = 'Specify taxdump file e.g. nodes dmp which is a mapping in col 1 of taxid and rank in col 3')
 parser.add_argument('-taxmapCols', required = False,  type = int, nargs="+", default=[1,3], help = 'Specify columns to map taxid (first entry) to rank (second). Will be minimum 2 values. Default: [1,3] starting index 1')
-parser.add_argument('-additionals', required = False,  type = str, nargs="+", default=['common name'], help = 'Specify extra column types to pull i.e. common name')
+parser.add_argument('-additionals', required = False,  type = str, nargs="+", default=['genbank common name'], help = 'Specify extra column types to pull i.e. common name')
 parser.add_argument('-names', required = False,  type = str, help = 'To Use with names.dmp')
 parser.add_argument('-taxd', required = False,  type = str, default="\t\t\|", help = 'Delimiter for taxdump file, defaults to \t\t| which is frome nodes.dmp')
 parser.add_argument('-download', dest="download", required = False, action='store_true', help = 'Download taxdump file for getting rank to taxid mapping (need nodes.dmp). Outputs to either -taxdump and if empty to -o')
@@ -133,8 +133,8 @@ def map_names(file, additionals):
             type = line_split[2]
             name=  line_split[1]
             taxid= int(line_split[0])
+            
             if type in additionals:
-                
                 if taxid not in mapping:
                     mapping[taxid] = []
                 mapping[taxid].append(name+" ("+type+")")
@@ -203,23 +203,24 @@ def main():
         print("All reads were classified, adding unclassified to fullstring output...")
         df_report = pd.DataFrame( [[0.0,0,0,"U",0,"unclassified"]], columns=cols_report ).append(df_report,  ignore_index=True)
     # tax = pd.read_csv(vars(args)['taxdump'], delimiter=r"vars(args)['taxd']", header=None)
-    tax_map = dict()
-    if vars(args)['taxdump']:
-        tax_map = map_ranks(vars(args)['taxdump'])
-    nodes = read_report(df_report, tax_map)
+    
     # nodes = df_report.apply(read_report, args=(tax_map,))
     # outmap = df_out.set_index('id').to_dict('index') # make a dict from the out file to use the tax mapping with
     # print(outmap)
     # write_report(file=vars(args)['o'], nodes=nodes, df=df_out)
-    df_report['fullstring'] = df_report['taxid'].apply(get_fullstring, args=(nodes,)   )
     names_map = dict()
+    tax_map = dict()
+    if vars(args)['taxdump']:
+        tax_map = map_ranks(vars(args)['taxdump'])  
+    nodes = read_report(df_report, tax_map)
+    df_report['fullstring'] = df_report['taxid'].apply(get_fullstring, args=(nodes,)   )
+
+    
     if  vars(args)['names'] and len(vars(args)['additionals']) > 0:
         names_map = map_names(vars(args)['names'], vars(args)['additionals'])
         df_report['extra_names'] = df_report['taxid'].apply(get_names, args=(names_map,)   )
-    else:
+    else: 
         df_report['extra_names']= ''
-    print(df_report.tail()['extra_names'])
-
     
     df_report.to_csv(vars(args)['o'], sep="\t", index=False, header=False)    # make the final fullstring file
     # bash krakenreport2json.sh -i /opt/data/${data.data.filename}.fullstring -o /opt/data/${data.data.filename}.json`

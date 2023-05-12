@@ -1,0 +1,12 @@
+name: mytax
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+dependencies:
+  - anytree 
+  - pip  
+  - openblas=0.3.18 
+  - numpy
+  - kraken2
+  - pandas
